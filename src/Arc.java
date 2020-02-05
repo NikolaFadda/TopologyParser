@@ -10,8 +10,8 @@ public class Arc {
 
     public Arc(Node tail, Node head, int capacity){
 
-        this.head= head;
-        this.tail=tail;
+        this.head= new Node (head.ID,head.type);
+        this.tail= new Node (tail.ID,tail.type);
         this.capacity=capacity;
     }
 
