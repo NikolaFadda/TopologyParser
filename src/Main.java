@@ -1,9 +1,6 @@
 import java.io.*;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /*
     Authors: Andrea Corronca, Nicola Fadda, Alessio Murgioni
@@ -48,6 +45,8 @@ public class Main {
         //Auxiliary variables
         int nodeNumber, arcNumber=0, auxCapacity=0;
         Node[] nodeList=null;
+        List<Node> sourceList= new LinkedList<Node>();
+        List<Node> sinkList= new LinkedList<Node>();
         Set<Arc> arcSet=null;
         Node auxHead, auxTail;
         Arc auxArc;
@@ -79,24 +78,23 @@ public class Main {
 
             }
 
-            //Initialization of node List after retrieval of
-
-            //System.out.println("La grandezza di nodelist è: "+nodeList.length);
             //"n" is the flag for node
             else if(rowElements[0].equals("n")){
 
-                //Initialization of the Source
+                //Initialization of a Source and insertion in both nodeList and sourceSet
                 if (Integer.parseInt(rowElements[2])>0){
 
                     //nodeList.set(Integer.parseInt(rowElements[1]) -1, new Node(Integer.parseInt(rowElements[1]),1));
                     nodeList[Integer.parseInt(rowElements[1])-1]= new Node(Integer.parseInt(rowElements[1]),1);
+                    sourceList.add(new Node(Integer.parseInt(rowElements[1]),1));
                 }
 
-                //Initialization of the Sink
+                //Initialization of a Sink and insertion in both nodeList and sinkSet
                 if (Integer.parseInt(rowElements[2])<0){
 
                     //nodeList.set(Integer.parseInt(rowElements[1]) -1, new Node(Integer.parseInt(rowElements[1]),-1));
                     nodeList[Integer.parseInt(rowElements[1])-1]= new Node(Integer.parseInt(rowElements[1]),-1);
+                    sinkList.add(new Node(Integer.parseInt(rowElements[1]),-1));
                 }
 
             }
@@ -126,14 +124,55 @@ public class Main {
             }
 
 
-        }
 
+
+        }
+/*
         System.out.println("NodeList size:"+nodeList.length+"\nSink node is node: 47\nInflow List\t\t\tOutflow List");
         Node sink = nodeList[46];
         for (int i=0;i<sink.inflow.size();i++){
             System.out.println(sink.inflow.get(i).tail.ID+" "+sink.inflow.get(i).head.ID+" "+sink.inflow.get(i).capacity+
             "\t\t"+sink.outflow.get(i).tail.ID+" "+sink.outflow.get(i).head.ID+" "+sink.outflow.get(i).capacity);
+*/
+
+        //I guarantee that no arc will enter the source
+        //I remove from arcSet every arc inside the source's inflow list
+        int auxIndex=0, auxSize=0;
+        Arc toRemove;
+        for(int i=0; i<sourceList.size();i++){
+
+            auxIndex=sourceList.get(i).ID;
+            auxSize= nodeList[auxIndex-1].inflow.size();
+
+            for(int j=0; j<auxSize; j++){
+
+                toRemove=nodeList[auxIndex-1].inflow.get(j);
+                arcSet.remove(toRemove);
+
+            }
+
+            nodeList[auxIndex-1].inflow.clear();
+            System.out.println("Breakpoint per la source");
         }
+
+        //I guarantee that no arc will exit the sink
+        //I remove from arcSet every arc inside the sink's outflow list
+        for(int i=0; i<sinkList.size();i++){
+
+            auxIndex=sinkList.get(i).ID;
+            auxSize= nodeList[auxIndex-1].outflow.size();
+
+            for(int j=0; j<auxSize; j++){
+
+                toRemove=nodeList[auxIndex-1].outflow.get(j);
+                arcSet.remove(toRemove);
+
+            }
+
+            nodeList[auxIndex-1].outflow.clear();
+            System.out.println("Breakpoint per il sink");
+        }
+
 
 
 
