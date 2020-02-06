@@ -15,7 +15,7 @@ public class Arc {
         this.capacity=capacity;
     }
 
-
+/*
     public boolean equals (Arc a){
 
         if((this.head.equals(a.head))&&(this.tail.equals(a.tail))) return true;
@@ -23,4 +23,5 @@ public class Arc {
 
         return false;
     }
+    */
 }

@@ -38,7 +38,8 @@ public class Main {
     public static void main(String[] args) throws FileNotFoundException, IOException {
 
         //Preparation for reading the file
-        FileReader input = new FileReader("/home/nikola/Scrivania/OldTopologies/gte_bad.20");
+        String path = "/home/nikola/Scrivania/OldTopologies/gte_bad.20";
+        FileReader input = new FileReader(path);
         BufferedReader bufRead = new BufferedReader(input);
         String myLine = null;
 
@@ -173,10 +174,52 @@ public class Main {
             System.out.println("Breakpoint per il sink");
         }
 
+        Arc a15, a51;
+        a15= new Arc(nodeList[0],nodeList[4],769230);
+        a51 = new Arc(nodeList[4],nodeList[0],769230);
+
+        System.out.println("Contains (1,5,769230):"+arcSet.contains(a15));
+        System.out.println("Contains (5,1,769230):"+arcSet.contains(a51));
+        System.out.println("Size of the Arc Set: "+arcSet.size());
+        //For each node in nodeList, I traverse its outflow list
+
+        for (Node n : nodeList
+             ) {
+
+        //For each arc in the outflow list of a node, I reverse the arc and erase it from the arcSet
+            for (Arc a : n.outflow
+                 ) {
+
+                    //Arc reversal
+                    auxArc= new Arc(a.head,a.tail,a.capacity);
+
+                    //Arc removal
+                    arcSet.remove(auxArc);
+
+            }
+
+        }
+
+        System.out.println("Contains (1,5,1132):"+arcSet.contains(a15));
+        System.out.println("Contains (5,1,1132):"+arcSet.contains(a51));
+        System.out.println("Size of the Arc Set: "+arcSet.size());
+
+        File newfile = new File ("/home/nikola/Scrivania/Converted.txt");
+        newfile.createNewFile();
+        FileWriter writer = new FileWriter(newfile);
 
 
+        writer.write(nodeList.length+"\n"+arcSet.size()+"\n"+sourceList.get(0).ID+"\n"+sinkList.get(0).ID+"\n");
+        for (Arc a: arcSet
+             ) {
+            writer.write(a.head.ID+" "+a.tail.ID+" "+a.capacity+"\n");
 
-//        File newTopology = new File("/home/nikola/Scrivania/OldTopologies/"+nodeNumber+"nodes_"+arcNumber+"arcs.txt");
+        }
+
+        writer.flush();
+        writer.close();
+
+//        File newTopology = new File("/home/nikola/Scrivania/OldTopologies/Converted.txt");
 //        FileWriter writer = new FileWriter()
 
     }
