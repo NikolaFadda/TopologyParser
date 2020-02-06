@@ -1,3 +1,4 @@
+import java.util.LinkedList;
 import java.util.List;
 
 public class Node {
@@ -12,8 +13,10 @@ public class Node {
 
         this.ID=ID;
         this.type=type;
-        this.outflow=null;
-        this.inflow=null;
+        this.outflow= new LinkedList<Arc>();
+        this.inflow= new LinkedList<Arc>();
+
+
 
 
     }

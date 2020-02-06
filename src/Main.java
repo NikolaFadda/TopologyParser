@@ -1,6 +1,7 @@
 import java.io.*;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -39,14 +40,17 @@ public class Main {
 
     public static void main(String[] args) throws FileNotFoundException, IOException {
 
-
+        //Preparation for reading the file
         FileReader input = new FileReader("/home/nikola/Scrivania/OldTopologies/gte_bad.20");
         BufferedReader bufRead = new BufferedReader(input);
         String myLine = null;
+
+        //Auxiliary variables
         int nodeNumber, arcNumber=0, auxCapacity=0;
         Node[] nodeList=null;
         Set<Arc> arcSet=null;
         Node auxHead, auxTail;
+        Arc auxArc;
         String[] row, rowElements;
         while ( (myLine = bufRead.readLine()) != null)
         {
@@ -55,17 +59,18 @@ public class Main {
             // check to make sure you have valid data
 
             rowElements = row[0].split(" ");
-            System.out.println(rowElements[0].equals("p"));
+
             //"c" is the flag for comment
             if(rowElements[0].equals("c")){}
 
             //"p" is the flag about the general settings of the graph
             else if (rowElements[0].equals("p")){
-                System.out.println("Joe Mama"+rowElements[2]+" "+rowElements[3]);
+
                 nodeNumber= Integer.parseInt(rowElements[2]);
                 arcNumber=Integer.valueOf(rowElements[3]);
                 System.out.println("# Nodes: "+nodeNumber+" # Arcs: "+arcNumber);
                 nodeList = new Node[nodeNumber];
+                arcSet = new HashSet<Arc>(arcNumber);
                 for(int i=0;i<nodeNumber;i++){
 
                     nodeList[i]= new Node(i+1,0);
@@ -111,38 +116,25 @@ public class Main {
 
                 //I save the arc capacity
                 auxCapacity=Integer.parseInt(rowElements[4]);
-
+                auxArc = new Arc(auxTail,auxHead,auxCapacity);
                 //I add the arc into arcSet, and I cannot have a double arc
-                arcSet.add(new Arc(auxTail,auxHead,auxCapacity));
+                arcSet.add(auxArc);
 
                 //To be sure, I add the arc to the tail's ouflow and to the head's inflow
-
-                auxHead=nodeList[auxHead.ID -1];
-                auxHead.inflow.add(new Arc(auxTail,auxHead,auxCapacity));
-                auxTail=nodeList[auxTail.ID -1];
-                auxTail.outflow.add(new Arc(auxTail,auxHead,auxCapacity));
-
-                nodeList[auxHead.ID -1] = auxHead;
+                nodeList[auxHead.ID-1].inflow.add(auxArc);
+                nodeList[auxTail.ID-1].outflow.add(auxArc);
             }
 
 
-
-
-
-
         }
 
-        //System.out.println("NodeList size:"+nodeList.length+"Sink node is node: 47\nInflow List");
-        Node sink = nodeList[45];
+        System.out.println("NodeList size:"+nodeList.length+"\nSink node is node: 47\nInflow List\t\t\tOutflow List");
+        Node sink = nodeList[46];
         for (int i=0;i<sink.inflow.size();i++){
-            System.out.println(sink.inflow.get(i).tail+" "+sink.inflow.get(i).head+" "+sink.inflow.get(i).capacity);
-
+            System.out.println(sink.inflow.get(i).tail.ID+" "+sink.inflow.get(i).head.ID+" "+sink.inflow.get(i).capacity+
+            "\t\t"+sink.outflow.get(i).tail.ID+" "+sink.outflow.get(i).head.ID+" "+sink.outflow.get(i).capacity);
         }
-        System.out.println("\nOutflow List:\n");
-        for (int i=0;i<sink.outflow.size();i++){
-            System.out.println(sink.outflow.get(i).tail+" "+sink.outflow.get(i).head+" "+sink.outflow.get(i).capacity);
 
-        }
 
 
 //        File newTopology = new File("/home/nikola/Scrivania/OldTopologies/"+nodeNumber+"nodes_"+arcNumber+"arcs.txt");
