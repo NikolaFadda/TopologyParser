@@ -15,13 +15,12 @@ public class Arc {
         this.capacity=capacity;
     }
 
-/*
+
     public boolean equals (Arc a){
 
-        if((this.head.equals(a.head))&&(this.tail.equals(a.tail))) return true;
-        if((this.head.equals(a.tail))&&(this.tail.equals(a.head))) return true;
+        if (this.head.equals(a.head) && this.tail.equals(a.tail) ) return true;
 
         return false;
     }
-    */
+
 }

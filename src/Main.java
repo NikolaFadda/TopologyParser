@@ -48,7 +48,7 @@ public class Main {
         Node[] nodeList=null;
         List<Node> sourceList= new LinkedList<Node>();
         List<Node> sinkList= new LinkedList<Node>();
-        Set<Arc> arcSet=null;
+        List<Arc> arcList=null;
         Node auxHead, auxTail;
         Arc auxArc;
         String[] row, rowElements;
@@ -70,7 +70,7 @@ public class Main {
                 arcNumber=Integer.valueOf(rowElements[3]);
                 System.out.println("# Nodes: "+nodeNumber+" # Arcs: "+arcNumber);
                 nodeList = new Node[nodeNumber];
-                arcSet = new HashSet<Arc>(arcNumber);
+                arcList = new LinkedList<Arc>();
                 for(int i=0;i<nodeNumber;i++){
 
                     nodeList[i]= new Node(i+1,0);
@@ -117,7 +117,7 @@ public class Main {
                 auxCapacity=Integer.parseInt(rowElements[4]);
                 auxArc = new Arc(auxTail,auxHead,auxCapacity);
                 //I add the arc into arcSet, and I cannot have a double arc
-                arcSet.add(auxArc);
+                arcList.add(auxArc);
 
                 //To be sure, I add the arc to the tail's ouflow and to the head's inflow
                 nodeList[auxHead.ID-1].inflow.add(auxArc);
@@ -148,7 +148,7 @@ public class Main {
             for(int j=0; j<auxSize; j++){
 
                 toRemove=nodeList[auxIndex-1].inflow.get(j);
-                arcSet.remove(toRemove);
+                arcList.remove(toRemove);
 
             }
 
@@ -166,7 +166,7 @@ public class Main {
             for(int j=0; j<auxSize; j++){
 
                 toRemove=nodeList[auxIndex-1].outflow.get(j);
-                arcSet.remove(toRemove);
+                arcList.remove(toRemove);
 
             }
 
@@ -174,43 +174,26 @@ public class Main {
             System.out.println("Breakpoint per il sink");
         }
 
-        Arc a15, a51;
-        a15= new Arc(nodeList[0],nodeList[4],769230);
-        a51 = new Arc(nodeList[4],nodeList[0],769230);
 
-        System.out.println("Contains (1,5,769230):"+arcSet.contains(a15));
-        System.out.println("Contains (5,1,769230):"+arcSet.contains(a51));
-        System.out.println("Size of the Arc Set: "+arcSet.size());
-        //For each node in nodeList, I traverse its outflow list
+        //I erase double arcs
+        for (int i=0; i< arcList.size();i++){
 
-        for (Node n : nodeList
-             ) {
+            for (int j=i+1; j<arcList.size();j++){
 
-        //For each arc in the outflow list of a node, I reverse the arc and erase it from the arcSet
-            for (Arc a : n.outflow
-                 ) {
+                if (arcList.get(j).equals(arcList.get(i))) arcList.remove(j);
 
-                    //Arc reversal
-                    auxArc= new Arc(a.head,a.tail,a.capacity);
-
-                    //Arc removal
-                    arcSet.remove(auxArc);
 
             }
 
         }
 
-        System.out.println("Contains (1,5,1132):"+arcSet.contains(a15));
-        System.out.println("Contains (5,1,1132):"+arcSet.contains(a51));
-        System.out.println("Size of the Arc Set: "+arcSet.size());
-
-        File newfile = new File ("/home/nikola/Scrivania/Converted.txt");
+        File newfile = new File ("/home/nikola/Scrivania/NewTopologies/Converted.txt");
         newfile.createNewFile();
         FileWriter writer = new FileWriter(newfile);
 
 
-        writer.write(nodeList.length+"\n"+arcSet.size()+"\n"+sourceList.get(0).ID+"\n"+sinkList.get(0).ID+"\n");
-        for (Arc a: arcSet
+        writer.write(nodeList.length+"\n"+arcList.size()+"\n"+sourceList.get(0).ID+"\n"+sinkList.get(0).ID+"\n");
+        for (Arc a: arcList
              ) {
             writer.write(a.head.ID+" "+a.tail.ID+" "+a.capacity+"\n");
 

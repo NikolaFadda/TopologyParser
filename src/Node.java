@@ -24,9 +24,9 @@ public class Node {
 
 
     public boolean equals(Node o) {
-        if(this.ID < o.ID) return false;
-        if(this.ID > o.ID) return false;
+        if(this.ID == o.ID) return true;
 
-        return true;
+
+        return false;
     }
 }
