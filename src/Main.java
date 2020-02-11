@@ -221,21 +221,7 @@ public class Main {
             pathfinder.andraStep();
         }
 
-       /* for (int i=0; i< pathfinder.visitedArcs.size();i++){
-
-            for (int j=i+1; j<pathfinder.visitedArcs.size();j++){
-
-                if (pathfinder.visitedArcs.get(j).equals(pathfinder.visitedArcs.get(i))) pathfinder.visitedArcs.remove(j);
-
-
-            }
-
-        }*/
-
-
-
-
-        String filename = pathfinder.visitedNodes.size()+"_nodes_"+pathfinder.visitedArcs.size()+"_arcs.txt";
+        String filename = pathfinder.nodes.length+"_nodes_"+pathfinder.visitedArcs.size()+"_arcs.txt";
         File newfile = new File ("/home/nikola/Scrivania/NewTopologies/"+filename);
         newfile.createNewFile();
         FileWriter writer = new FileWriter(newfile);

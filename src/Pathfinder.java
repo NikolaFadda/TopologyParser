@@ -179,6 +179,7 @@ public class Pathfinder {
             //I proceed to add this node the Visited Nodes
             System.out.println("Adding node " + n.ID + " to Nodes Visited");
 
+
             if(visitedNodes.contains(n)){
 
             }else {
@@ -208,6 +209,9 @@ public class Pathfinder {
 
         //I transfer all the nodes belonging to the lists of nodes to add inside the list of nodes to visit
         this.toVisit.addAll(nodeToAdd);
+
+        
+
         this.nodeToAdd.clear();
 
     }
