@@ -38,7 +38,7 @@ public class Main {
     public static void main(String[] args) throws FileNotFoundException, IOException {
 
         //Preparation for reading the file
-        String path = "/home/nikola/Scrivania/OldTopologies/gte_bad.20";
+        String path = "/home/nikola/Scrivania/OldTopologies/mannaggia.txt";
         FileReader input = new FileReader(path);
         BufferedReader bufRead = new BufferedReader(input);
         String myLine = null;
@@ -46,9 +46,9 @@ public class Main {
         //Auxiliary variables
         int nodeNumber, arcNumber=0, auxCapacity=0;
         Node[] nodeList=null;
-        List<Node> sourceList= new LinkedList<Node>();
-        List<Node> sinkList= new LinkedList<Node>();
-        List<Arc> arcList=null;
+        LinkedList<Node> sourceList= new LinkedList<Node>();
+        LinkedList<Node> sinkList= new LinkedList<Node>();
+        LinkedList<Arc> arcList=null;
         Node auxHead, auxTail;
         Arc auxArc;
         String[] row, rowElements;
@@ -71,6 +71,7 @@ public class Main {
                 System.out.println("# Nodes: "+nodeNumber+" # Arcs: "+arcNumber);
                 nodeList = new Node[nodeNumber];
                 arcList = new LinkedList<Arc>();
+
                 for(int i=0;i<nodeNumber;i++){
 
                     nodeList[i]= new Node(i+1,0);
@@ -103,61 +104,98 @@ public class Main {
             //"a" is the flag for arc
             if(rowElements[0].equals("a")){
                 //I save the data about the tail from nodeList
-                //auxTail=new Node(nodeList.get(Integer.parseInt(rowElements[1])-1).ID,
-                //                 nodeList.get(Integer.parseInt(rowElements[1])-1).type);
 
                 auxTail=new Node (nodeList[Integer.parseInt(rowElements[1])-1].ID,
-                                  nodeList[Integer.parseInt(rowElements[1])-1].type);
+                        nodeList[Integer.parseInt(rowElements[1])-1].type);
 
                 //I save the data about the head from nodeList
                 auxHead=new Node (nodeList[Integer.parseInt(rowElements[2])-1].ID,
-                                  nodeList[Integer.parseInt(rowElements[2])-1].type);
+                        nodeList[Integer.parseInt(rowElements[2])-1].type);
 
                 //I save the arc capacity
                 auxCapacity=Integer.parseInt(rowElements[4]);
                 auxArc = new Arc(auxTail,auxHead,auxCapacity);
-                //I add the arc into arcSet, and I cannot have a double arc
+                //I add the arc into arcList, and I cannot have a double arc
                 arcList.add(auxArc);
 
                 //To be sure, I add the arc to the tail's ouflow and to the head's inflow
-                nodeList[auxHead.ID-1].inflow.add(auxArc);
-                nodeList[auxTail.ID-1].outflow.add(auxArc);
+
+                //nodeList[auxHead.ID-1].inflow.add(auxArc);
+                //nodeList[auxTail.ID-1].outflow.add(auxArc);
             }
 
 
 
 
         }
-/*
-        System.out.println("NodeList size:"+nodeList.length+"\nSink node is node: 47\nInflow List\t\t\tOutflow List");
-        Node sink = nodeList[46];
-        for (int i=0;i<sink.inflow.size();i++){
-            System.out.println(sink.inflow.get(i).tail.ID+" "+sink.inflow.get(i).head.ID+" "+sink.inflow.get(i).capacity+
-            "\t\t"+sink.outflow.get(i).tail.ID+" "+sink.outflow.get(i).head.ID+" "+sink.outflow.get(i).capacity);
-*/
+
+
+        //I erase double arcs, even if they have different lower bound values
+        for (int i=0; i< arcList.size();i++){
+
+            for (int j=i+1; j<arcList.size();j++){
+
+                if (arcList.get(j).equals(arcList.get(i))) arcList.remove(j);
+
+
+            }
+
+        }
+
+        //I insert the arc in the correct inflow and outflow lists
+        for (Arc a: arcList
+             ) {
+
+            nodeList[a.head.ID-1].inflow.add(a);
+            nodeList[a.tail.ID-1].outflow.add(a);
+
+        }
 
         //I guarantee that no arc will enter the source
-        //I remove from arcSet every arc inside the source's inflow list
-        int auxIndex=0, auxSize=0;
-        Arc toRemove;
+        //I remove from arcList every arc inside the source's inflow list
+        int auxIndex=0, auxSize=0, outflowSize=0;
+        Arc toRemove, reverseToRemove ;
+
+        //For every source node in the list
         for(int i=0; i<sourceList.size();i++){
 
+            //I get the dimension of the source's inflow
             auxIndex=sourceList.get(i).ID;
             auxSize= nodeList[auxIndex-1].inflow.size();
 
+            //For every arc in the source's inflow
             for(int j=0; j<auxSize; j++){
 
+
                 toRemove=nodeList[auxIndex-1].inflow.get(j);
+                //reverseToRemove= new Arc(toRemove.head, toRemove.tail, toRemove.capacity);
+                //I remove it from the arcList
+
                 arcList.remove(toRemove);
+
+                //I also remove it from the tail node's outflow
+
+                outflowSize=nodeList[toRemove.tail.ID-1].outflow.size();
+
+                for (int a=0;a<outflowSize;a++){
+
+                    if(nodeList[toRemove.tail.ID-1].outflow.get(a).head.ID==toRemove.head.ID){
+                        reverseToRemove= nodeList[toRemove.tail.ID-1].outflow.get(a);
+                        //arcList.remove(reverseToRemove);
+                        nodeList[toRemove.tail.ID-1].outflow.remove(a);
+                        outflowSize=nodeList[toRemove.tail.ID-1].outflow.size();
+                    }
+                }
+
 
             }
 
             nodeList[auxIndex-1].inflow.clear();
-            System.out.println("Breakpoint per la source");
+
         }
 
         //I guarantee that no arc will exit the sink
-        //I remove from arcSet every arc inside the sink's outflow list
+        //I remove from arcList every arc inside the sink's outflow list
         for(int i=0; i<sinkList.size();i++){
 
             auxIndex=sinkList.get(i).ID;
@@ -171,41 +209,54 @@ public class Main {
             }
 
             nodeList[auxIndex-1].outflow.clear();
-            System.out.println("Breakpoint per il sink");
+
         }
 
 
-        //I erase double arcs
-        for (int i=0; i< arcList.size();i++){
 
-            for (int j=i+1; j<arcList.size();j++){
+        Pathfinder pathfinder = new Pathfinder(sinkList, sourceList, nodeList, arcList);
+        pathfinder.initialStep();
 
-                if (arcList.get(j).equals(arcList.get(i))) arcList.remove(j);
+       while(pathfinder.toVisit.size()>0){
+            pathfinder.andraStep();
+        }
+
+       /* for (int i=0; i< pathfinder.visitedArcs.size();i++){
+
+            for (int j=i+1; j<pathfinder.visitedArcs.size();j++){
+
+                if (pathfinder.visitedArcs.get(j).equals(pathfinder.visitedArcs.get(i))) pathfinder.visitedArcs.remove(j);
 
 
             }
 
-        }
+        }*/
 
-        File newfile = new File ("/home/nikola/Scrivania/NewTopologies/Converted.txt");
+
+
+
+        String filename = pathfinder.visitedNodes.size()+"_nodes_"+pathfinder.visitedArcs.size()+"_arcs.txt";
+        File newfile = new File ("/home/nikola/Scrivania/NewTopologies/"+filename);
         newfile.createNewFile();
         FileWriter writer = new FileWriter(newfile);
 
 
-        writer.write(nodeList.length+"\n"+arcList.size()+"\n"+sourceList.get(0).ID+"\n"+sinkList.get(0).ID+"\n");
-        for (Arc a: arcList
-             ) {
-            writer.write(a.head.ID+" "+a.tail.ID+" "+a.capacity+"\n");
+        writer.write(pathfinder.nodes.length+"\n"+pathfinder.visitedArcs.size()+"\n"
+                +sourceList.get(0).ID+"\n"+sinkList.get(0).ID+"\n");
+        for (Arc a: pathfinder.visitedArcs
+        ) {
+            writer.write(a.tail.ID+" "+a.head.ID+" "+a.capacity+"\n");
 
         }
 
         writer.flush();
         writer.close();
 
-//        File newTopology = new File("/home/nikola/Scrivania/OldTopologies/Converted.txt");
-//        FileWriter writer = new FileWriter()
+
+
 
     }
 }
 
-//"/home/nikola/Scrivania/OldTopologies/gte_bad.20"
+
+

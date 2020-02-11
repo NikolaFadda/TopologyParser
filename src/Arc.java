@@ -20,6 +20,7 @@ public class Arc {
 
         if (this.head.equals(a.head) && this.tail.equals(a.tail) ) return true;
 
+
         return false;
     }
 
