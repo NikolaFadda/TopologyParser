@@ -16,6 +16,8 @@ import java.util.*;
     -Arcs in the form of [(tail, head) capacity]
 
     The resulting graph is guaranteed to have at least one directed path from Source to Sink
+    In case of multiple sources, we choose the one with more outgoing arcs.
+    In case of multiple sinks, we choose the one with more ingoing arcs.
     This parsing function has been tuned starting from the code snippet available at:
     https://stackoverflow.com/questions/5819772/java-parsing-text-file
 
@@ -29,6 +31,9 @@ import java.util.*;
     -Nodo Pozzo (selezionato come il nodo con maggior inflow)
     -Archi nella forma [(coda, testa) capacità]
 
+    Il grafo risultante possiederà sicuramente almeno un cammino orientato dalla Sorgente al Pozzo.
+    Se dovessero essere presenti più Sorgenti, verrà scelta quella con più archi uscenti.
+    Se dovessero essere presenti più Pozzi, verrà scelto quello con più archi entranti.
     La funzione di parsing è stata modificata a partire dallo snippet riportato a questo indirizzo:
     https://stackoverflow.com/questions/5819772/java-parsing-text-file
  */
@@ -38,7 +43,7 @@ public class Main {
     public static void main(String[] args) throws FileNotFoundException, IOException {
 
         //Preparation for reading the file
-        String path = "/home/nikola/Scrivania/OldTopologies/mannaggia.txt";
+        String path = "/home/nikola/Scrivania/OldTopologies/multist.txt";
         FileReader input = new FileReader(path);
         BufferedReader bufRead = new BufferedReader(input);
         String myLine = null;
@@ -226,9 +231,33 @@ public class Main {
         newfile.createNewFile();
         FileWriter writer = new FileWriter(newfile);
 
+        int maxSource=0, maxSink=0, sourceID=0, sinkID=0;
+
+        //I choose as my source the one among them that has the highest number of outgoing arcs
+        for (Node n: pathfinder.sources
+             ) {
+
+            if(nodeList[n.ID-1].outflow.size()>maxSource){
+
+                maxSource=n.outflow.size();
+                sourceID=n.ID;
+            }
+        }
+
+        //I choose as my sink the one among them that has the highest number of ingoing arcs
+        for (Node n: pathfinder.sinks
+             ) {
+
+            if(nodeList[n.ID-1].inflow.size()>maxSink){
+
+                maxSink=n.outflow.size();
+                sinkID=n.ID;
+            }
+
+        }
 
         writer.write(pathfinder.nodes.length+"\n"+pathfinder.visitedArcs.size()+"\n"
-                +sourceList.get(0).ID+"\n"+sinkList.get(0).ID+"\n");
+                +sourceID+"\n"+sinkID+"\n");
         for (Arc a: pathfinder.visitedArcs
         ) {
             writer.write(a.tail.ID+" "+a.head.ID+" "+a.capacity+"\n");
