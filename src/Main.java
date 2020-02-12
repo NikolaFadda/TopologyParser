@@ -43,7 +43,7 @@ public class Main {
     public static void main(String[] args) throws FileNotFoundException, IOException {
 
         //Preparation for reading the file
-        String path = "/home/nikola/Scrivania/OldTopologies/multist.txt";
+        String path = "/home/nikola/Scrivania/OldTopologies/stndrd6.net";
         FileReader input = new FileReader(path);
         BufferedReader bufRead = new BufferedReader(input);
         String myLine = null;
@@ -57,6 +57,8 @@ public class Main {
         Node auxHead, auxTail;
         Arc auxArc;
         String[] row, rowElements;
+        Set<Arc> arcSet;
+
         while ( (myLine = bufRead.readLine()) != null)
         {
 
@@ -134,18 +136,18 @@ public class Main {
 
         }
 
+        //I'm erasing all double arcs
+        arcSet= new LinkedHashSet<Arc>(arcList);
+        arcList.clear();
+        arcList.addAll(arcSet);
 
-        //I erase double arcs, even if they have different lower bound values
-        for (int i=0; i< arcList.size();i++){
+        for (Arc arc: arcList
+             ) {
 
-            for (int j=i+1; j<arcList.size();j++){
-
-                if (arcList.get(j).equals(arcList.get(i))) arcList.remove(j);
-
-
-            }
-
+            System.out.println("Arco: "+ arc.tail.ID+"->"+arc.head.ID);
         }
+
+
 
         //I insert the arc in the correct inflow and outflow lists
         for (Arc a: arcList
@@ -271,6 +273,8 @@ public class Main {
 
 
     }
+
+
 }
 
 
